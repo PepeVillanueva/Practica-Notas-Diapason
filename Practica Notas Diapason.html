@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>Práctica Diapasón</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: Arial, sans-serif;
+      background-color: #f3f4f6;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      font-size: 1.5rem;
+    }
+    .note-options {
+      display: grid;
+      grid-template-columns: repeat(4, auto);
+      gap: 10px;
+      margin: 20px 0;
+      justify-content: center;
+    }
+    .checkbox-group {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .button {
+      padding: 14px 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 10px 5px;
+      width: 90%;
+      max-width: 300px;
+    }
+    .note-display {
+      font-size: 2.8rem;
+      font-weight: bold;
+      color: #333;
+      margin: 30px 0 10px;
+      text-align: center;
+    }
+    .fret-display {
+      font-size: 1.2rem;
+      color: #444;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .hidden {
+      display: none;
+    }
+    label {
+      font-size: 1rem;
+    }
+    .microphone-control {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .mic-indicator {
+      width: 10px;
+      height: 10px;
+      background-color: red;
+      border-radius: 50%;
+      display: none;
+    }
+    .mic-indicator.active {
+      display: inline-block;
+    }
+  </style>
+</head>
+<body>
+  <h1>Práctica de Notas en el Diapasón</h1>
+
+  <div class="config-section" id="configSection">
+    <p>Selecciona las notas a practicar:</p>
+    <div class="note-options" id="noteOptions"></div>
+
+    <div class="checkbox-group">
+      <label><input type="checkbox" id="includeSharps"> Sostenidos (#)</label>
+      <label><input type="checkbox" id="includeFlats"> Bemoles (b)</label>
+    </div>
+
+    <div class="controls">
+      <label for="volumeSlider">Volumen: <span id="volumeValue">0.5</span></label>
+      <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5">
+      <label><input type="checkbox" id="soundToggle" checked> Sonido activado</label>
+    </div>
+
+    <button class="button" id="startButton">Iniciar práctica</button>
+  </div>
+
+  <div class="practice-section hidden" id="practiceSection">
+    <div class="note-display" id="noteDisplay">---</div>
+    <div class="fret-display hidden" id="fretDisplay"></div>
+    <button class="button" id="newNoteButton">Nueva nota</button>
+    <button class="button" id="showFretsButton">Trastes</button>
+
+    <div class="controls">
+      <label for="volumeSliderPractice">Volumen: <span id="volumeValuePractice">0.5</span></label>
+      <input type="range" id="volumeSliderPractice" min="0" max="1" step="0.01" value="0.5">
+      <label><input type="checkbox" id="soundTogglePractice" checked> Sonido activado</label>
+    </div>
+
+    <div class="microphone-control hidden" id="micControl">
+      <label><input type="checkbox" id="micToggle"> Activar control por voz (decir "siguiente", "otra", "nota nueva")</label>
+      <span class="mic-indicator" id="micIndicator"></span>
+    </div>
+  </div>
+
+  <script>
+    // Variables globales para notas
+    const naturalNotes = ["A", "B", "C", "D", "E", "F", "G"];
+    const sharps = { A: "A#", C: "C#", D: "D#", F: "F#", G: "G#" };
+    const flats = { A: "Ab", B: "Bb", D: "Db", E: "Eb", G: "Gb" };
+    const strings = [1, 2, 3, 4, 5, 6];
+    const colors = ["#FDE68A", "#A7F3D0", "#BFDBFE", "#FBCFE8", "#DDD6FE", "#FEF3C7", "#E0F2FE"];
+    const tuning = { 6: "E", 5: "A", 4: "D", 3: "G", 2: "B", 1: "E" };
+    const semitones = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+    const noteFreqMap = (() => {
+      const baseFreq = 440;
+      const map = {};
+      semitones.forEach((note, i) => {
+        map[note] = baseFreq * Math.pow(2, (i - 9) / 12);
+      });
+      map["Ab"] = map["G#"];
+      map["Bb"] = map["A#"];
+      map["Db"] = map["C#"];
+      map["Eb"] = map["D#"];
+      map["Gb"] = map["F#"];
+      return map;
+    })();
+
+    const noteOptionsContainer = document.getElementById("noteOptions");
+    const noteDisplay = document.getElementById("noteDisplay");
+    const fretDisplay = document.getElementById("fretDisplay");
+    const configSection = document.getElementById("configSection");
+    const practiceSection = document.getElementById("practiceSection");
+
+    const volumeSlider1 = document.getElementById("volumeSlider");
+    const volumeSlider2 = document.getElementById("volumeSliderPractice");
+    const volumeValue1 = document.getElementById("volumeValue");
+    const volumeValue2 = document.getElementById("volumeValuePractice");
+    const soundToggle1 = document.getElementById("soundToggle");
+    const soundToggle2 = document.getElementById("soundTogglePractice");
+
+    const micCheckbox = document.getElementById("micToggle");
+    const micControl = document.getElementById("micControl");
+    const micIndicator = document.getElementById("micIndicator");
+
+    let currentNote = null;
+    let currentString = null;
+    let previousNote = null;
+    let recognition;
+
+    function createNoteCheckboxes() {
+      naturalNotes.forEach(note => {
+        const label = document.createElement("label");
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.value = note;
+        checkbox.name = "note";
+        label.appendChild(checkbox);
+        label.append(note);
+        noteOptionsContainer.appendChild(label);
+      });
+    }
+
+    function getSelectedNotes() {
+      const selected = Array.from(document.querySelectorAll("input[name='note']:checked")).map(cb => cb.value);
+      const includeSharps = document.getElementById("includeSharps").checked;
+      const includeFlats = document.getElementById("includeFlats").checked;
+      let allNotes = [...selected];
+      if (includeSharps) selected.forEach(n => { if (sharps[n]) allNotes.push(sharps[n]); });
+      if (includeFlats) selected.forEach(n => { if (flats[n]) allNotes.push(flats[n]); });
+      return allNotes;
+    }
+
+    function getRandomItem(arr, exclude) {
+      if (arr.length === 1) return arr[0];
+      let item;
+      do {
+        item = arr[Math.floor(Math.random() * arr.length)];
+      } while (item === exclude);
+      return item;
+    }
+
+    function getVolume() {
+      return parseFloat(volumeSlider2.value);
+    }
+
+    function isSoundEnabled() {
+      return soundToggle2.checked;
+    }
+
+    function playNote(note) {
+      if (!isSoundEnabled()) return;
+      const freq = noteFreqMap[note] || 440;
+      const volume = getVolume();
+      const ctx = new (window.AudioContext || window.webkitAudioContext)();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = freq;
+      gain.gain.setValueAtTime(volume, ctx.currentTime);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      setTimeout(() => { osc.stop(); ctx.close(); }, 1000);
+    }
+
+    function generateNote() {
+      const availableNotes = getSelectedNotes();
+      if (availableNotes.length === 0) {
+        alert("Selecciona al menos una nota.");
+        return;
+      }
+      const newNote = getRandomItem(availableNotes, previousNote);
+      previousNote = newNote;
+      currentNote = newNote;
+      currentString = getRandomItem(strings);
+      document.body.style.backgroundColor = getRandomItem(colors);
+      noteDisplay.textContent = `${newNote} de cuerda ${currentString}`;
+      fretDisplay.classList.add("hidden");
+      fretDisplay.textContent = "";
+      playNote(newNote);
+    }
+
+    function showFrets() {
+      const noteToIndex = (note) => {
+        if (note.includes("b")) {
+          const base = Object.entries(flats).find(([_, v]) => v === note)?.[0] || note;
+          return (semitones.indexOf(base) + 11) % 12;
+        }
+        return semitones.indexOf(note);
+      };
+      const baseIndex = semitones.indexOf(tuning[currentString]);
+      const targetIndex = noteToIndex(currentNote);
+      const frets = [];
+      for (let fret = 0; fret <= 12; fret++) {
+        const idx = (baseIndex + fret) % 12;
+        if (idx === targetIndex) frets.push(fret);
+      }
+      fretDisplay.textContent = frets.length
+        ? (frets.length === 1 ? `Traste: ${frets[0]}` : `Trastes: ${frets.join(", ")}`)
+        : "No encontrado en esta cuerda (0–12)";
+      fretDisplay.classList.remove("hidden");
+    }
+
+    function initVoiceRecognition() {
+      try {
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SpeechRecognition) throw new Error("API no soportada");
+        recognition = new SpeechRecognition();
+        recognition.lang = 'es-ES';
+        recognition.continuous = true;
+        recognition.interimResults = false;
+
+        recognition.onresult = function(event) {
+          const transcript = event.results[event.results.length - 1][0].transcript.trim().toLowerCase();
+          if (["siguiente", "otra", "nota nueva"].some(cmd => transcript.includes(cmd))) {
+            if (typeof generateNote === 'function') {
+              generateNote();
+            }
+          }
+        };
+
+        recognition.onstart = function() {
+          micIndicator.classList.add("active");
+        };
+
+        recognition.onend = function() {
+          micIndicator.classList.remove("active");
+        };
+
+        recognition.onerror = function(event) {
+          console.warn("Error en reconocimiento de voz:", event.error);
+        };
+
+        micCheckbox.addEventListener("change", () => {
+          if (micCheckbox.checked) {
+            try { recognition.start(); } catch (e) {}
+          } else {
+            recognition.stop();
+          }
+        });
+      } catch (err) {
+        micCheckbox.disabled = true;
+        micCheckbox.parentElement.innerText = "Control por voz no disponible en este navegador.";
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      createNoteCheckboxes();
+      initVoiceRecognition();
+      document.getElementById("startButton").addEventListener("click", () => {
+        if (getSelectedNotes().length === 0) {
+          alert("Debes seleccionar al menos una nota.");
+          return;
+        }
+        micControl.classList.remove("hidden");
+        configSection.classList.add("hidden");
+        practiceSection.classList.remove("hidden");
+        volumeSlider2.value = volumeSlider1.value;
+        volumeValue2.textContent = volumeSlider1.value;
+        soundToggle2.checked = soundToggle1.checked;
+        generateNote();
+      });
+      document.getElementById("newNoteButton").addEventListener("click", generateNote);
+      document.getElementById("showFretsButton").addEventListener("click", showFrets);
+      volumeSlider1.addEventListener("input", () => {
+        volumeSlider2.value = volumeSlider1.value;
+        volumeValue1.textContent = volumeSlider1.value;
+        volumeValue2.textContent = volumeSlider1.value;
+      });
+      volumeSlider2.addEventListener("input", () => {
+        volumeSlider1.value = volumeSlider2.value;
+        volumeValue1.textContent = volumeSlider2.value;
+        volumeValue2.textContent = volumeSlider2.value;
+      });
+      soundToggle1.addEventListener("change", () => {
+        soundToggle2.checked = soundToggle1.checked;
+      });
+      soundToggle2.addEventListener("change", () => {
+        soundToggle1.checked = soundToggle2.checked;
+      });
+    });
+  </script>
+</body>
+</html>
