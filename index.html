@@ -40,6 +40,13 @@
       gap: 10px;
       margin-bottom: 20px;
     }
+    .button-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
     .button {
       padding: 14px 28px;
       font-size: 1rem;
@@ -104,13 +111,17 @@
       <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.5">
       <label><input type="checkbox" id="soundToggle" checked> Sonido activado</label>
     </div>
-    <button class="button" id="startButton">Iniciar práctica</button>
+    <div class="button-group">
+      <button class="button" id="startButton">Iniciar práctica</button>
+    </div>
   </div>
   <div class="practice-section hidden" id="practiceSection">
     <div class="note-display" id="noteDisplay">---</div>
     <div class="fret-display hidden" id="fretDisplay"></div>
-    <button class="button" id="newNoteButton">Nueva nota</button>
-    <button class="button" id="showFretsButton">Trastes</button>
+    <div class="button-group">
+      <button class="button" id="newNoteButton">Nueva nota</button>
+      <button class="button" id="showFretsButton">Trastes</button>
+    </div>
     <div class="controls">
       <label for="volumeSliderPractice">Volumen: <span id="volumeValuePractice">0.5</span></label>
       <input type="range" id="volumeSliderPractice" min="0" max="1" step="0.01" value="0.5">
@@ -122,7 +133,6 @@
     </div>
   </div>
   <script>
-    // VARIABLES GLOBALES
 const naturalNotes = ["A", "B", "C", "D", "E", "F", "G"];
 const sharps = { A: "A#", C: "C#", D: "D#", F: "F#", G: "G#" };
 const flats = { A: "Ab", B: "Bb", D: "Db", E: "Eb", G: "Gb" };
@@ -150,7 +160,6 @@ let currentString = null;
 let previousNote = null;
 let recognition;
 
-// FUNCIONES
 function createNoteCheckboxes() {
   const container = document.getElementById("noteOptions");
   naturalNotes.forEach(note => {
@@ -287,21 +296,17 @@ function initVoiceRecognition() {
         generateNote();
       }
     };
-    recognition.onstart = function() {
-      micIndicator.classList.add("active");
-    };
-    recognition.onend = function() {
+    recognition.onstart = () => micIndicator.classList.add("active");
+    recognition.onend = () => {
       micIndicator.classList.remove("active");
       if (micCheckbox.checked) {
-        setTimeout(() => { try { recognition.start(); } catch (e) {} }, 500);
+        setTimeout(() => { try { recognition.start(); } catch {} }, 500);
       }
     };
-    recognition.onerror = function(event) {
-      console.warn("Error en reconocimiento de voz:", event.error);
-    };
+    recognition.onerror = event => console.warn("Error en reconocimiento de voz:", event.error);
     micCheckbox.addEventListener("change", () => {
       if (micCheckbox.checked) {
-        try { recognition.start(); } catch (e) {}
+        try { recognition.start(); } catch {}
       } else {
         recognition.stop();
       }
@@ -312,7 +317,6 @@ function initVoiceRecognition() {
   }
 }
 
-// INICIO
 window.addEventListener("DOMContentLoaded", () => {
   createNoteCheckboxes();
   loadNotePreferences();
@@ -352,7 +356,6 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("soundToggle").checked = e.target.checked;
   });
 });
-    // Para mantenerlo limpio, lo podemos dividir por secciones.
-  </script>
+</script>
 </body>
 </html>
