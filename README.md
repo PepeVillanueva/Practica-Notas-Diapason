@@ -1,6 +1,6 @@
-# 🎸 Práctica de Notas en el Diapasón
+# 🎸 Práctica de encontrar notas en el Diapasón
 
-Aplicación web interactiva diseñada para practicar la identificación de notas musicales en el diapasón de la guitarra. Perfecta para estudiantes de música y guitarristas que quieren mejorar su memoria visual del mástil.
+Aplicación web interactiva diseñada para practicar la ubicación de notas musicales en el diapasón de la guitarra. Perfecta para estudiantes de música y guitarristas que quieren mejorar su memoria visual del mástil.
 
 ## 🧠 ¿Qué hace esta aplicación?
 
