@@ -1,51 +1,79 @@
-# 🎸 Práctica de encontrar notas en el Diapasón
+# 🎸 Práctica Diapasón – App interactiva para guitarra
 
-Aplicación web interactiva diseñada para practicar la ubicación de notas musicales en el diapasón de la guitarra. Perfecta para estudiantes de música y guitarristas que quieren mejorar su memoria visual del mástil.
-
-## 🧠 ¿Qué hace esta aplicación?
-
-Muestra de forma aleatoria una nota musical y una cuerda de guitarra, y reta al usuario a adivinar en qué traste(s) se encuentra esa nota. Es una herramienta de entrenamiento visual y auditivo que se puede usar en cualquier dispositivo, sin necesidad de instalar nada.
+Aplicación web **autocontenida** (un solo archivo `.html`), diseñada para ayudarte a memorizar las **notas del diapasón** de la guitarra. Funciona sin conexión, sin necesidad de instalar nada ni lanzar servidores. Compatible con móviles y ordenadores.
 
 ---
 
-## ✨ Funcionalidades principales
+## 🚀 ¿Qué puedes practicar?
 
-- ✅ Generación aleatoria de notas y cuerdas de guitarra (6 cuerdas).
-- 🚫 No repite la misma nota consecutivamente durante una sesión.
-- 🔈 Reproduce el sonido de la nota (ajustable y opcional).
-- 🎚 Control de volumen antes y durante la práctica.
-- 🎵 Selección de notas a practicar mediante checkboxes (sin usar el teclado).
-- ♯♭ Opción para incluir sostenidos (#) y/o bemoles (b).
-- 👆 Botón “Trastes” para mostrar en qué trastes se encuentra la nota generada (0 a 12).
-- 🧠 Control por voz (opcional):
-  - Al decir “siguiente”, “otra” o “nota nueva”, se genera una nueva nota.
-  - Micrófono siempre activo mientras el checkbox esté marcado.
-- 💾 Guarda automáticamente tus preferencias de notas entre sesiones (no guarda volumen ni sonido).
+Al iniciar, se te pregunta:
 
----
+> **¿Qué quieres practicar?**
 
-## 📱 Compatible con móviles
+Tienes dos opciones:
 
-- ✔️ Interfaz adaptada a pantalla completa y táctil.
-- ✔️ Funciona en navegadores modernos (Chrome recomendado).
-- ⚠️ Para que el control por voz funcione, **debe abrirse desde HTTPS** (como GitHub Pages). No funciona desde archivos locales (`file://`).
+### 🟦 Modo 1: Ubicar trastes según nota y cuerda
 
----
+* Se muestra una nota aleatoria (ej. `B de cuerda 5`).
+* Tú debes mentalmente ubicarla en el diapasón.
+* Puedes comprobar la respuesta pulsando el botón **“Trastes”**, que indica los trastes correctos.
+* Opción de control por voz: decir **“otra”**, **“siguiente”** o **“nota nueva”** genera una nueva pregunta.
 
-## 🧭 Cómo usar
+### 🟩 Modo 2: Averiguar nota según traste y cuerda
 
-1. **Selecciona las notas** que quieres practicar (por ejemplo: A, C, G).
-2. Opcional: activa los sostenidos y/o bemoles.
-3. Ajusta el volumen y activa/desactiva el sonido si deseas.
-4. Pulsa **“Iniciar práctica”**.
-5. En la práctica:
-   - Aparecerá una nota con su cuerda correspondiente (por ejemplo: `B de cuerda 5`).
-   - Intenta recordar en qué traste se encuentra esa nota.
-   - Pulsa **“Trastes”** si no sabes la respuesta.
-   - Pulsa **“Nueva nota”** o di “siguiente” (si tienes el control por voz activado).
+* Se muestra una combinación aleatoria (ej. `Traste 7 de cuerda 2`).
+* Tú debes adivinar qué nota es.
+* Puedes comprobar la respuesta con el botón **“Mostrar 🎵”** (no reproduce sonido).
+* Al generar la combinación, se reproduce el sonido de la nota si el sonido está activado.
+* También soporta control por voz (mismas palabras clave).
 
 ---
 
-## 🌐 Publicación
+## ⚙️ Configuración antes de practicar
 
-Puedes alojar esta aplicación como sitio web usando GitHub Pages. Simplemente abre el archivo HTML desde una URL segura y empieza a practicar.
+* Selecciona las **notas a practicar** (ej: A, B, C…).
+* Puedes incluir **sostenidos (#)** y/o **bemoles (b)** si lo deseas.
+* El sistema generará solo combinaciones válidas según tu selección.
+
+---
+
+## 🔈 Controles de sonido
+
+* Puedes **activar/desactivar el sonido** desde la interfaz (modo configuración o práctica).
+* Puedes **ajustar el volumen** con un deslizador.
+* El sonido reproduce un tono con frecuencia correspondiente a la nota mostrada.
+
+---
+
+## 🎤 Control por voz (opcional)
+
+* Una vez iniciada la práctica, puedes **activar el control por voz**.
+* Funciona diciendo: `"siguiente"`, `"otra"`, `"nota nueva"` (en español).
+* Se muestra un **indicador rojo** cuando el micro está escuchando.
+* Compatible con navegadores que soporten `webkitSpeechRecognition` o `SpeechRecognition`.
+
+---
+
+## 📱 Optimizado para móviles
+
+* Diseño vertical y adaptado a pantalla completa.
+* Todos los controles son táctiles (sin necesidad de teclado).
+
+---
+
+## 🔁 Funcionalidades extra
+
+* Nunca se repite la **misma nota consecutivamente** (modo 1).
+* Puedes volver al menú principal con el botón **“Volver al inicio”**.
+* Tu selección de notas se guarda entre sesiones.
+* El fondo cambia de color en cada nueva pregunta para hacerlo más dinámico.
+* Iconos visuales decorativos como SVG de trastes y 🎵 para una experiencia más agradable.
+
+---
+
+## 🧩 Cómo usar la app
+
+1. Abre el archivo `.html` en cualquier navegador moderno.
+2. Selecciona el modo de práctica.
+3. Configura las notas que quieres trabajar.
+4. ¡Empieza a practicar!
